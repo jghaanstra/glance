@@ -47,6 +47,10 @@ func (widget *groupWidget) requiresUpdate(now *time.Time) bool {
 	return widget.containerWidgetBase._requiresUpdate(now)
 }
 
+func (widget *groupWidget) requiresUpdateWithin(now *time.Time, duration time.Duration) bool {
+	return widget.containerWidgetBase._requiresUpdateWithin(now, duration)
+}
+
 func (widget *groupWidget) Render() template.HTML {
 	return widget.renderTemplate(widget, groupWidgetTemplate)
 }

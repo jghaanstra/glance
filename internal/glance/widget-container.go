@@ -56,3 +56,13 @@ func (widget *containerWidgetBase) _requiresUpdate(now *time.Time) bool {
 
 	return false
 }
+
+func (widget *containerWidgetBase) _requiresUpdateWithin(now *time.Time, duration time.Duration) bool {
+	for i := range widget.Widgets {
+		if widget.Widgets[i].requiresUpdateWithin(now, duration) {
+			return true
+		}
+	}
+
+	return false
+}

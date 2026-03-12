@@ -17,5 +17,6 @@
 * [Bookmark Favicon Caching](https://github.com/glanceapp/glance/pull/439)
 * [Markets Widget Duration Parameter](https://github.com/glanceapp/glance/pull/547)
 * [Search Suggestions and Configurable Shortcuts](https://github.com/glanceapp/glance/pull/706)
+* [Regular Background Widget Refresh](https://github.com/glanceapp/glance/pull/712)
 
 For detailed widget configuration examples, see [WIDGET EXAMPLES](WIDGET_EXAMPLES.md)

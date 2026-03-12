@@ -272,6 +272,46 @@ func (p *page) updateOutdatedWidgets() {
 	wg.Wait()
 }
 
+// updateWidgetsWithinDuration updates widgets that are outdated or will become outdated within the given duration
+func (p *page) updateWidgetsWithinDuration(duration time.Duration) {
+	now := time.Now()
+
+	var wg sync.WaitGroup
+	context := context.Background()
+
+	for w := range p.HeadWidgets {
+		widget := p.HeadWidgets[w]
+
+		if !widget.requiresUpdateWithin(&now, duration) {
+			continue
+		}
+
+		wg.Add(1)
+		go func(w widget) {
+			defer wg.Done()
+			w.update(context)
+		}(widget)
+	}
+
+	for c := range p.Columns {
+		for w := range p.Columns[c].Widgets {
+			widget := p.Columns[c].Widgets[w]
+
+			if !widget.requiresUpdateWithin(&now, duration) {
+				continue
+			}
+
+			wg.Add(1)
+			go func(w widget) {
+				defer wg.Done()
+				w.update(context)
+			}(widget)
+		}
+	}
+
+	wg.Wait()
+}
+
 func (a *application) resolveUserDefinedAssetPath(path string) string {
 	if strings.HasPrefix(path, "/assets/") {
 		return a.Config.Server.BaseURL + path
@@ -617,6 +657,11 @@ func (a *application) server() (func() error, func() error) {
 		Handler: mux,
 	}
 
+	// Start background refresh if enabled
+	if a.Config.Server.BackgroundRefreshEnabled {
+		a.startBackgroundRefresh()
+	}
+
 	start := func() error {
 		log.Printf("Starting server on %s:%d (base-url: \"%s\", assets-path: \"%s\")\n",
 			a.Config.Server.Host,
@@ -633,8 +678,78 @@ func (a *application) server() (func() error, func() error) {
 	}
 
 	stop := func() error {
+		// Stop background refresh first
+		a.stopBackgroundRefresh()
 		return server.Close()
 	}
 
 	return start, stop
 }
+
+// startBackgroundRefresh starts a goroutine that periodically refreshes outdated widgets
+func (a *application) startBackgroundRefresh() {
+	refreshInterval := a.Config.Server.BackgroundRefreshInterval
+
+	a.backgroundRefreshTicker = time.NewTicker(refreshInterval)
+	a.stopBackground = make(chan struct{})
+
+	log.Printf("Starting background widget refresh every %v", refreshInterval)
+
+	go func() {
+		for {
+			select {
+			case <-a.backgroundRefreshTicker.C:
+				a.refreshAllOutdatedWidgets()
+			case <-a.stopBackground:
+				return
+			}
+		}
+	}()
+}
+
+// stopBackgroundRefresh stops the background refresh goroutine
+func (a *application) stopBackgroundRefresh() {
+	if a.backgroundRefreshTicker != nil {
+		a.backgroundRefreshTicker.Stop()
+	}
+	if a.stopBackground != nil {
+		close(a.stopBackground)
+	}
+}
+
+// refreshAllOutdatedWidgets proactively updates widgets that are outdated or will become outdated before the next refresh cycle
+func (a *application) refreshAllOutdatedWidgets() {
+	log.Println("Running background widget refresh...")
+
+	var wg sync.WaitGroup
+	refreshInterval := a.Config.Server.BackgroundRefreshInterval
+
+	for _, pagePtr := range a.slugToPage {
+		wg.Add(1)
+		go func(p *page) {
+			defer wg.Done()
+			
+			// Use a timeout for each page to prevent hanging
+			done := make(chan struct{})
+			go func() {
+				defer close(done)
+				p.mu.Lock()
+				defer p.mu.Unlock()
+				// Use predictive refresh: update widgets that will be outdated before next cycle
+				p.updateWidgetsWithinDuration(refreshInterval)
+			}()
+			
+			select {
+			case <-done:
+				// Update completed normally
+			case <-time.After(30 * time.Second):
+				// Timeout - log warning but continue
+				log.Printf("Background refresh timeout for page: %s", p.Slug)
+			}
+		}(pagePtr)
+	}
+
+	wg.Wait()
+	log.Println("Background widget refresh completed")
+}
+
