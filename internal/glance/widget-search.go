@@ -14,15 +14,24 @@ type SearchBang struct {
 	URL      string
 }
 
+type SearchShortcut struct {
+	Title string `yaml:"title"`
+	URL   string `yaml:"url"`
+	Alias string `yaml:"alias"`
+}
+
 type searchWidget struct {
-	widgetBase   `yaml:",inline"`
-	cachedHTML   template.HTML `yaml:"-"`
-	SearchEngine string        `yaml:"search-engine"`
-	Bangs        []SearchBang  `yaml:"bangs"`
-	NewTab       bool          `yaml:"new-tab"`
-	Target       string        `yaml:"target"`
-	Autofocus    bool          `yaml:"autofocus"`
-	Placeholder  string        `yaml:"placeholder"`
+	widgetBase       `yaml:",inline"`
+	cachedHTML       template.HTML      `yaml:"-"`
+	SearchEngine     string             `yaml:"search-engine"`
+	Bangs            []SearchBang       `yaml:"bangs"`
+	Shortcuts        []SearchShortcut   `yaml:"shortcuts"`
+	Suggestions      bool               `yaml:"suggestions"`
+	SuggestionEngine string             `yaml:"suggestion-engine"`
+	NewTab           bool               `yaml:"new-tab"`
+	Target           string             `yaml:"target"`
+	Autofocus        bool               `yaml:"autofocus"`
+	Placeholder      string             `yaml:"placeholder"`
 }
 
 func convertSearchUrl(url string) string {
@@ -39,7 +48,12 @@ var searchEngines = map[string]string{
 	"kagi": "https://kagi.com/search?q={QUERY}",
 	"startpage": "https://www.startpage.com/search?q={QUERY}",
 }
-
+var suggestionEngines = map[string]string{
+	"google": "https://suggestqueries.google.com/complete/search?output=firefox&q={QUERY}",
+	"duckduckgo": "https://duckduckgo.com/ac/?q={QUERY}&type=list",
+	"bing": "https://www.bing.com/osjson.aspx?query={QUERY}",
+	"startpage": "https://startpage.com/suggestions?q={QUERY}&format=opensearch",
+}
 func (widget *searchWidget) initialize() error {
 	widget.withTitle("Search").withError(nil)
 
@@ -51,11 +65,24 @@ func (widget *searchWidget) initialize() error {
 		widget.Placeholder = "Type here to search…"
 	}
 
+	originalSearchEngine := widget.SearchEngine
 	if url, ok := searchEngines[widget.SearchEngine]; ok {
 		widget.SearchEngine = url
 	}
 
 	widget.SearchEngine = convertSearchUrl(widget.SearchEngine)
+
+	// Set default suggestion engine if suggestions are enabled
+	if widget.Suggestions && widget.SuggestionEngine == "" {
+		widget.SuggestionEngine = originalSearchEngine
+	}
+
+	// Convert suggestion engine preset to URL if applicable
+	if widget.Suggestions && widget.SuggestionEngine != "" {
+		if url, ok := suggestionEngines[widget.SuggestionEngine]; ok {
+			widget.SuggestionEngine = url
+		}
+	}
 
 	for i := range widget.Bangs {
 		if widget.Bangs[i].Shortcut == "" {
@@ -68,8 +95,17 @@ func (widget *searchWidget) initialize() error {
 
 		widget.Bangs[i].URL = convertSearchUrl(widget.Bangs[i].URL)
 	}
+	for i := range widget.Shortcuts {
+		if widget.Shortcuts[i].Title == "" {
+			return fmt.Errorf("search shortcut #%d has no title", i+1)
+		}
 
-	widget.cachedHTML = widget.renderTemplate(widget, searchWidgetTemplate)
+		if widget.Shortcuts[i].URL == "" {
+			return fmt.Errorf("search shortcut #%d has no URL", i+1)
+		}
+	}
+
+	widget.ContentAvailable = true	widget.cachedHTML = widget.renderTemplate(widget, searchWidgetTemplate)
 	return nil
 }
 
