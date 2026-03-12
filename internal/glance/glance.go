@@ -54,8 +54,6 @@ type application struct {
 	// used when background-refresh-only-when-clients is enabled; counts
 	// active HTTP requests so we can skip refreshes when nobody is visiting
 	activeRequests int64
-
-	stopBackground         chan struct{}
 }
 
 func newApplication(c *config) (*application, error) {
