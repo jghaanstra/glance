@@ -147,3 +147,55 @@ Then in bookmarks, simply use `icon: favicon`:
   - `icon` (optional): Icon (supports `favicon`, emoji, URLs, or icon libraries)
   - `description` (optional): Link description
 
+---
+
+## Search Widget (with Suggestions & Shortcuts)
+
+The search widget provides a customizable search bar. You can define
+search `bangs` (shortcuts that redirect to a specific site using a
+prefix), configure arbitrary `shortcuts` for quick navigation, and enable
+`search suggestions` pulled from a suggestion engine.
+
+```yaml
+- type: search
+  search-engine: duckduckgo          # base search URL, use {QUERY} placeholder if custom
+  suggestions: true                  # enable suggestions dropdown
+  suggestion-engine: google          # preset engine or custom URL
+  shortcuts:
+    - title: Gmail
+      url: https://mail.google.com
+      alias: gm
+    - title: GitHub
+      url: https://github.com
+      alias: gh
+  bangs:
+    - title: YouTube
+      shortcut: "!yt"
+      url: https://www.youtube.com/results?search_query=!QUERY
+  autofocus: true
+  placeholder: "Type to search or use bangs…"
+```
+
+**Features:**
+- Fuzzy-matched shortcuts with optional aliases
+- Keyboard navigation of dropdown (Arrow keys, Tab/Shift+Tab, Enter)
+- Search suggestions fetched from a configurable engine (Google, DuckDuckGo, Bing, Startpage, or custom)
+- Bangs support (e.g. `!yt cats` to search YouTube)
+- Detects URLs and navigates directly
+- Visual error indicator when suggestion service fails
+
+**Properties:**
+- `search-engine` (required): Primary search URL, supports presets or custom URL containing `{QUERY}`
+- `suggestions` (optional, default: false): Enable retrieval of real‑time suggestions
+- `suggestion-engine` (optional): Preset name or custom URL for suggestions; defaults to the same as `search-engine` when suggestions enabled
+- `shortcuts` (optional): Array of quick‑link shortcuts
+  - `title` (required): Display text
+  - `url` (required): Destination URL
+  - `alias` (optional): Short alias for fuzzy matching
+- `bangs` (optional): Array of search bangs
+  - `title` (required): Display name
+  - `shortcut` (required): Prefix string starting with `!`
+  - `url` (required): Search URL containing `!QUERY` placeholder
+- `autofocus`, `placeholder` behave as usual for input widgets
+
+
