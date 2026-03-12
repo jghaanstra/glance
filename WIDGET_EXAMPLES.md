@@ -149,6 +149,35 @@ Then in bookmarks, simply use `icon: favicon`:
 
 ---
 
+## Background Refresh Configuration
+
+The background refresh feature allows the server to proactively update widgets on a regular schedule,
+which reduces perceived latency for end users. It is configured at the `server` level and applies to
+all pages.
+
+```yaml
+server:
+  host: 0.0.0.0
+  port: 8080
+  # how often the server wakes up to refresh widgets (every 5 minutes by default)
+  background-refresh-interval: 5m
+  # if true, refreshes happen only when there is at least one connected client
+  background-refresh-only-when-clients: true
+```
+
+**How it works:**
+1. The application starts a ticker that fires at the specified interval.
+2. When the ticker fires, every widget on every active page is asked whether it
+   will require an update within the next interval (`requiresUpdateWithin`).
+3. Widgets that declare they need an update are refreshed in parallel in the
+   background (their `update` method is called).
+4. Client browsers still fetch widget data on page load, but most of the work is
+   already done, resulting in faster page renders.
+
+These options were introduced in the merge of PR #712 and are available in
+**version 0.9 and later**.
+
+
 ## Search Widget (with Suggestions & Shortcuts)
 
 The search widget provides a customizable search bar. You can define

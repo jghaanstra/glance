@@ -34,9 +34,10 @@ type config struct {
 		Proxied                    bool          `yaml:"proxied"`
 		AssetsPath                 string        `yaml:"assets-path"`
 		BaseURL                    string        `yaml:"base-url"`
-		CachePath                  string        `yaml:"cache-path"`
-		BackgroundRefreshEnabled   bool          `yaml:"background-refresh-enabled"`
-		BackgroundRefreshInterval  time.Duration `yaml:"background-refresh-interval"`
+		CachePath                          string        `yaml:"cache-path"`
+		BackgroundRefreshEnabled           bool          `yaml:"background-refresh-enabled"`
+		BackgroundRefreshInterval          time.Duration `yaml:"background-refresh-interval"`
+		BackgroundRefreshOnlyWhenClients   bool          `yaml:"background-refresh-only-when-clients"`
 	} `yaml:"server"`
 
 	Auth struct {
@@ -104,6 +105,7 @@ func newConfigFromYAML(contents []byte) (*config, error) {
 	config.Server.Port = 8080
 	config.Server.BackgroundRefreshEnabled = false
 	config.Server.BackgroundRefreshInterval = 15 * time.Minute
+	config.Server.BackgroundRefreshOnlyWhenClients = false
 
 	err = yaml.Unmarshal(contents, config)
 	if err != nil {

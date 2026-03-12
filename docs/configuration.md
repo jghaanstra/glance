@@ -18,5 +18,6 @@ server:
 |----------|------|---------|-------------|
 | `background-refresh-enabled` | boolean | `false` | Enable the background widget refresh goroutine. |
 | `background-refresh-interval` | duration | `15m` | How often to check and update outdated widgets. |
+| `background-refresh-only-when-clients` | boolean | `false` | Skip refresh cycles when there are no active HTTP requests. |
 
 > **Tip:** shorter intervals keep data fresher but increase CPU/IO usage.

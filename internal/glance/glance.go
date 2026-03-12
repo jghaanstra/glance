@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -48,6 +49,12 @@ type application struct {
 
 	// Background refresh system
 	backgroundRefreshTicker *time.Ticker
+	stopBackground          chan struct{}
+
+	// used when background-refresh-only-when-clients is enabled; counts
+	// active HTTP requests so we can skip refreshes when nobody is visiting
+	activeRequests int64
+
 	stopBackground         chan struct{}
 }
 
@@ -656,12 +663,23 @@ func (a *application) server() (func() error, func() error) {
 		mux.Handle("/assets/{path...}", http.StripPrefix("/assets/", assetsFS))
 	}
 
+	// wrap the mux so we can count active requests when desired
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if a.Config.Server.BackgroundRefreshOnlyWhenClients {
+			atomic.AddInt64(&a.activeRequests, 1)
+			defer atomic.AddInt64(&a.activeRequests, -1)
+		}
+		mux.ServeHTTP(w, r)
+	})
+
 	server := http.Server{
 		Addr:    fmt.Sprintf("%s:%d", a.Config.Server.Host, a.Config.Server.Port),
-		Handler: mux,
+		Handler: handler,
 	}
 
-	// Start background refresh if enabled
+	// Start background refresh if enabled; the goroutine itself will check for
+	// the "only when clients" flag on each tick.
+	
 	if a.Config.Server.BackgroundRefreshEnabled {
 		a.startBackgroundRefresh()
 	}
@@ -703,6 +721,10 @@ func (a *application) startBackgroundRefresh() {
 		for {
 			select {
 			case <-a.backgroundRefreshTicker.C:
+				if a.Config.Server.BackgroundRefreshOnlyWhenClients && atomic.LoadInt64(&a.activeRequests) == 0 {
+					// nobody is actively requesting pages, skip this cycle
+					continue
+				}
 				a.refreshAllOutdatedWidgets()
 			case <-a.stopBackground:
 				return
