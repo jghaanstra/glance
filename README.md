@@ -13,6 +13,7 @@
 
 ## Merged PR's
 * [Analog Clock Widget](https://github.com/glanceapp/glance/pull/747)
+* [Server-Side Todo Storage](https://github.com/glanceapp/glance/pull/838)
 * [Calendar Events](https://github.com/glanceapp/glance/pull/836)
 * [Count Timer Widget](https://github.com/glanceapp/glance/pull/430)
 * [Bookmark Favicon Caching](https://github.com/glanceapp/glance/pull/439)

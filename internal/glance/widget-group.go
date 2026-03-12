@@ -51,6 +51,10 @@ func (widget *groupWidget) requiresUpdateWithin(now *time.Time, duration time.Du
 	return widget.containerWidgetBase._requiresUpdateWithin(now, duration)
 }
 
+func (widget *groupWidget) getNestedWidgets() widgets {
+	return widget.Widgets
+}
+
 func (widget *groupWidget) Render() template.HTML {
 	return widget.renderTemplate(widget, groupWidgetTemplate)
 }

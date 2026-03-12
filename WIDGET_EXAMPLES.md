@@ -215,6 +215,64 @@ server:
 These options were introduced in the merge of PR #712 and are available in
 **version 0.9 and later**.
 
+---
+
+## To-Do Widget (with Server-Side Storage)
+
+Displays an interactive to-do list. Tasks can be stored either in the browser's local storage (default) or on the server, allowing tasks to sync across devices and browsers.
+
+```yaml
+- type: to-do
+  id: my-tasks
+  storage-type: server
+```
+
+**Browser storage (default):**
+
+```yaml
+- type: to-do
+  id: work
+```
+
+**Server storage:**
+
+```yaml
+- type: to-do
+  id: shopping
+  storage-type: server
+```
+
+To use server storage, configure `data-path` in your server config:
+
+```yaml
+server:
+  host: 0.0.0.0
+  port: 8080
+  data-path: ./data  # directory where task files will be stored
+```
+
+Tasks are saved as JSON files at `<data-path>/to-do/<id>.json`.
+
+> **Docker users:** Mount the data directory so data persists across container restarts:
+> ```yaml
+> volumes:
+>   - /home/user/glance-data:/app/data
+> ```
+> And set `data-path: /app/data` in your config.
+
+**Features:**
+- Add, edit, check off, and delete tasks
+- Drag-and-drop to reorder tasks
+- Multiple independent lists using different `id` values
+- Server storage syncs tasks across all devices/browsers
+- Browser storage keeps tasks local to the device
+
+**Properties:**
+- `id` (optional): Unique identifier for the list. Used as the filename for server storage. Defaults to `"default"` when `storage-type` is `server`
+- `storage-type` (optional, default: `browser`): Where tasks are stored
+  - `browser` — browser localStorage, device/browser specific
+  - `server` — JSON file on the server under `data-path/to-do/`
+
 
 ## Search Widget (with Suggestions & Shortcuts)
 

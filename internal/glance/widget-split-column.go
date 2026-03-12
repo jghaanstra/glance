@@ -44,6 +44,10 @@ func (widget *splitColumnWidget) requiresUpdateWithin(now *time.Time, duration t
 	return widget.containerWidgetBase._requiresUpdateWithin(now, duration)
 }
 
+func (widget *splitColumnWidget) getNestedWidgets() widgets {
+	return widget.Widgets
+}
+
 func (widget *splitColumnWidget) Render() template.HTML {
 	return widget.renderTemplate(widget, splitColumnWidgetTemplate)
 }
