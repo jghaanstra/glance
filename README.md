@@ -5,7 +5,7 @@
 
 <p align="center"><strong>This is a fork of the original Glance repo which seems to be abandoned.<br>This fork has merged several PR's made on the original repo. Use it if you like but please<br> visit the original repo for instructions, information and possible support.<br>I'm by no means an experienced developer, use it at your own risk.</strong></p>
 
-<p align="center">I'm by no means an experienced developer, use it at your own risk.</strong></p>
+<p align="center">I'm by no means an experienced developer. The PR's have been merged with the help of AI, use it at your own risk.</strong></p>
 
 <p align="center"><a href="https://github.com/glanceapp/glance">ORIGINAL GLANCE REPOSITORY</a></p>
 
@@ -13,3 +13,6 @@
 
 ## Merged PR's
 * [Calendar Events](https://github.com/glanceapp/glance/pull/174)
+* [Count Timer Widget](https://github.com/glanceapp/glance/pull/430)
+
+For detailed widget configuration examples, see [WIDGET EXAMPLES](WIDGET_EXAMPLES.md)
