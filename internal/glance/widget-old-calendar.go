@@ -10,7 +10,7 @@ var oldCalendarWidgetTemplate = mustParseTemplate("old-calendar.html", "widget-b
 
 type oldCalendarWidget struct {
 	widgetBase  `yaml:",inline"`
-	Calendar    *calendar
+	Calendar    *oldCalendarData
 	StartSunday bool `yaml:"start-sunday"`
 }
 
@@ -21,7 +21,7 @@ func (widget *oldCalendarWidget) initialize() error {
 }
 
 func (widget *oldCalendarWidget) update(ctx context.Context) {
-	widget.Calendar = newCalendar(time.Now(), widget.StartSunday)
+	widget.Calendar = newOldCalendar(time.Now(), widget.StartSunday)
 	widget.withError(nil).scheduleNextUpdate()
 }
 
@@ -29,7 +29,7 @@ func (widget *oldCalendarWidget) Render() template.HTML {
 	return widget.renderTemplate(widget, oldCalendarWidgetTemplate)
 }
 
-type calendar struct {
+type oldCalendarData struct {
 	CurrentDay        int
 	CurrentWeekNumber int
 	CurrentMonthName  string
@@ -39,21 +39,21 @@ type calendar struct {
 
 // TODO: very inflexible, refactor to allow more customizability
 // TODO: allow changing between showing the previous and next week and the entire month
-func newCalendar(now time.Time, startSunday bool) *calendar {
+func newOldCalendar(now time.Time, startSunday bool) *oldCalendarData {
 	year, week := now.ISOWeek()
 	weekday := now.Weekday()
 	if !startSunday {
 		weekday = (weekday + 6) % 7 // Shift Monday to 0
 	}
 
-	currentMonthDays := daysInMonth(now.Month(), year)
+	currentMonthDays := oldDaysInMonth(now.Month(), year)
 
 	var previousMonthDays int
 
 	if previousMonthNumber := now.Month() - 1; previousMonthNumber < 1 {
-		previousMonthDays = daysInMonth(12, year-1)
+		previousMonthDays = oldDaysInMonth(12, year-1)
 	} else {
-		previousMonthDays = daysInMonth(previousMonthNumber, year)
+		previousMonthDays = oldDaysInMonth(previousMonthNumber, year)
 	}
 
 	startDaysFrom := now.Day() - int(weekday) - 7
@@ -72,7 +72,7 @@ func newCalendar(now time.Time, startSunday bool) *calendar {
 		days[i] = day
 	}
 
-	return &calendar{
+	return &oldCalendarData{
 		CurrentDay:        now.Day(),
 		CurrentWeekNumber: week,
 		CurrentMonthName:  now.Month().String(),
@@ -81,6 +81,6 @@ func newCalendar(now time.Time, startSunday bool) *calendar {
 	}
 }
 
-func daysInMonth(m time.Month, year int) int {
+func oldDaysInMonth(m time.Month, year int) int {
 	return time.Date(year, m+1, 0, 0, 0, 0, 0, time.UTC).Day()
 }

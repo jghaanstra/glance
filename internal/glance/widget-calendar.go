@@ -3,7 +3,6 @@ package glance
 import (
 	"context"
 	"fmt"
-	"errors"
 	"html/template"
 	"log"
 	"net/http"
