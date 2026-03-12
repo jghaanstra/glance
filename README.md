@@ -12,4 +12,4 @@
 ![](docs/images/readme-main-image.png)
 
 ## Merged PR's
-* [Add Stacks / Tabs widget](https://github.com/glanceapp/glance/pull/765)
+* [Calendar Events](https://github.com/glanceapp/glance/pull/174)

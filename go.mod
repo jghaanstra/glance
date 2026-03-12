@@ -3,6 +3,7 @@ module github.com/glanceapp/glance
 go 1.24.3
 
 require (
+	github.com/arran4/golang-ical v0.3.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/shirou/gopsutil/v4 v4.25.4

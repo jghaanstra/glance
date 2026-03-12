@@ -1,9 +1,0 @@
-{{ template "widget-base.html" . }}
-
-{{ define "widget-content-classes" }}widget-content-frameless{{ end }}
-
-{{ define "widget-content" }}
-{{- range $i, $widget := .Widgets }}
-{{- .Render -}}
-{{- end }}
-{{ end }}
