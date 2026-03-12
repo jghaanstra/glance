@@ -77,7 +77,7 @@ func (widget *bookmarksWidget) initialize() error {
 				parsedURL, err := url.Parse(link.URL)
 				if err == nil {
 					// set the favicon proxy url directly on the URL field
-					link.Icon.URL = "/api/favicon?sz=32&domain=" + parsedURL.Hostname()
+					link.Icon.URL = template.URL("/api/favicon?sz=32&domain=" + parsedURL.Hostname())
 				}
 			}
 		}
