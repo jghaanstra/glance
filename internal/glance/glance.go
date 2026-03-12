@@ -45,6 +45,10 @@ type application struct {
 	usernameHashToUsername map[string]string
 	authAttemptsMu         sync.Mutex
 	failedAuthAttempts     map[string]*failedAuthAttempt
+
+	// Background refresh system
+	backgroundRefreshTicker *time.Ticker
+	stopBackground         chan struct{}
 }
 
 func newApplication(c *config) (*application, error) {
@@ -287,9 +291,9 @@ func (p *page) updateWidgetsWithinDuration(duration time.Duration) {
 		}
 
 		wg.Add(1)
-		go func(w widget) {
+		go func(wgt widget) {
 			defer wg.Done()
-			w.update(context)
+			wgt.update(context)
 		}(widget)
 	}
 
@@ -302,9 +306,9 @@ func (p *page) updateWidgetsWithinDuration(duration time.Duration) {
 			}
 
 			wg.Add(1)
-			go func(w widget) {
+			go func(wgt widget) {
 				defer wg.Done()
-				w.update(context)
+				wgt.update(context)
 			}(widget)
 		}
 	}
