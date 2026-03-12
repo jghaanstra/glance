@@ -31,12 +31,13 @@ const undoEntrance = slideFade({ direction: "left", distance: "100%", duration: 
 
 export default function(element) {
     element.swapWith(Calendar(
-        Number(element.dataset.firstDayOfWeek ?? 1)
+        Number(element.dataset.firstDayOfWeek ?? 1),
+        element.dataset.events
     ));
 }
 
 // TODO: when viewing the previous/next month, display the current date if it's within the spill-over days
-function Calendar(firstDay) {
+function Calendar(firstDay, events) {
     let header, dates;
     let advanceTimeTicker;
     let now = new Date();
@@ -63,7 +64,7 @@ function Calendar(firstDay) {
 
     const calendar = elem().classes("calendar").append(
         header = Header(nextClicked, prevClicked, undoClicked),
-        dates = Dates(firstDay)
+        dates = Dates(firstDay, events)
     );
 
     update(now);
@@ -127,8 +128,12 @@ function Header(nextClicked, prevClicked, undoClicked) {
     });
 }
 
-function Dates(firstDay) {
+function Dates(firstDay, events) {
     let dates, lastRenderedDate;
+
+    const tooltip = document.createElement("div");
+    tooltip.className = "calendar-event-tooltip";
+    document.body.appendChild(tooltip);
 
     const updateFullMonth = function(now, newDate) {
         const firstWeekday = new Date(newDate.getFullYear(), newDate.getMonth(), 1).getDay();
@@ -143,7 +148,7 @@ function Dates(firstDay) {
         let index = 0;
 
         for (let i = 0; i < FULL_MONTH_SLOTS; i++) {
-            children[i].clearClasses("calendar-spillover-date", "calendar-current-date");
+            children[i].clearClasses("calendar-spillover-date", "calendar-current-date", "calendar-event-date");
         }
 
         for (let i = 0; i < previousMonthSpilloverDays; i++, index++) {
@@ -153,9 +158,29 @@ function Dates(firstDay) {
         }
 
         for (let i = 1; i <= currentMonthDays; i++, index++) {
-            children[index]
+            const thisDate = new Date(newDate.getFullYear(), newDate.getMonth(), i);
+            const child = children[index];
+            child
                 .classesIf(isCurrentMonth && i === currentDate, "calendar-current-date")
                 .text(i);
+            if (events && events !== "null") {
+                if (checkIfDateHasEvent(newDate, i, events)) {
+                    child.classes("calendar-event-date");
+                    child.addEventListener("mouseenter", (e) => {
+                        tooltip.innerHTML = getEventsForDate(thisDate, events).join("<br>");
+                        tooltip.style.display = "block";
+                        tooltip.style.left = e.pageX + 10 + "px";
+                        tooltip.style.top = e.pageY + 10 + "px";
+                    });
+                    child.addEventListener("mousemove", (e) => {
+                        tooltip.style.left = e.pageX + 10 + "px";
+                        tooltip.style.top = e.pageY + 10 + "px";
+                    });
+                    child.addEventListener("mouseleave", () => {
+                        tooltip.style.display = "none";
+                    });
+                }
+            }
         }
 
         for (let i = 0; i < nextMonthSpilloverDays; i++, index++) {
@@ -209,4 +234,35 @@ function msTillNextDay(now) {
       now.getMinutes() * 60_000 +
       now.getHours() * 3_600_000
     );
+}
+
+function checkIfDateHasEvent(activeMonth, date, events) {
+    const eventsObject = JSON.parse(events);
+    return eventsObject.some(event => {
+        const eventDate = new Date(event.Date);
+        return eventDate.getDate() === date &&
+            activeMonth.getMonth() === eventDate.getMonth() &&
+            activeMonth.getFullYear() === eventDate.getFullYear();
+    });
+}
+
+function getEventsForDate(date, events) {
+    const eventsObject = JSON.parse(events);
+    return eventsObject
+        .filter(ev => {
+            const evDate = new Date(ev.Date);
+            return isSameDay(date, evDate);
+        })
+        .map(ev => {
+            const evDate = new Date(ev.Date);
+            const hours = String(evDate.getHours()).padStart(2, '0');
+            const minutes = String(evDate.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes} - ${ev.Name}`;
+        });
+}
+
+function isSameDay(dateOnly, timeDate) {
+    return dateOnly.getFullYear() === timeDate.getFullYear() &&
+        dateOnly.getMonth() === timeDate.getMonth() &&
+        dateOnly.getDate() === timeDate.getDate();
 }

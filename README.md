@@ -13,7 +13,7 @@
 
 ## Merged PR's
 * [Analog Clock Widget](https://github.com/glanceapp/glance/pull/747)
-* [Calendar Events](https://github.com/glanceapp/glance/pull/174)
+* [Calendar Events](https://github.com/glanceapp/glance/pull/836)
 * [Count Timer Widget](https://github.com/glanceapp/glance/pull/430)
 * [Bookmark Favicon Caching](https://github.com/glanceapp/glance/pull/439)
 * [Markets Widget Duration Parameter](https://github.com/glanceapp/glance/pull/547)

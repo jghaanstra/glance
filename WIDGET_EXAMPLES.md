@@ -37,27 +37,28 @@ Displays one or more analog clock faces. The local time is always shown first; a
 
 ---
 
-## Calendar Widget (New - with Events)
+## Calendar Widget (with ICS Events)
 
-The new calendar widget displays a 3-week calendar view with support for events from ICS (iCalendar) files.
+Displays a full-month navigation calendar with support for events from ICS (iCalendar) URLs. Event days are highlighted and show a tooltip on hover.
 
 ```yaml
 - type: calendar
-  title: My Events Calendar
-  icsurl: https://example.com/calendar.ics
-  start-sunday: false
+  first-day-of-week: monday
+  ics:
+    - https://example.com/calendar.ics
+    - https://example.com/another.ics
 ```
 
 **Features:**
-- Fetches events from ICS/iCalendar URLs
+- Full-month calendar view with previous/next month navigation
+- Fetches events from one or more ICS/iCalendar URLs at startup
 - Days with events are highlighted in the primary color
-- Hover over event days to see event names
-- Shows current month, week number, and year
-- Updates on page load
+- Hover over an event day to see event names and times
+- Configurable first day of the week
 
 **Properties:**
-- `icsurl` (optional): URL to an ICS calendar file. If not provided, no events are displayed
-- `start-sunday` (optional, default: false): If true, Sunday is the first day of the week
+- `first-day-of-week` (optional, default: `monday`): First day of the week. Options: `sunday`, `monday`, `tuesday`, `wednesday`, `thursday`, `friday`, `saturday`
+- `ics` (optional): List of ICS calendar URLs. If omitted, no events are shown
 
 ---
 
