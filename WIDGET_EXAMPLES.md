@@ -1,5 +1,42 @@
 # Widget Configuration Examples
 
+## Analog Clock Widget
+
+Displays one or more analog clock faces. The local time is always shown first; additional timezones can be added.
+
+```yaml
+- type: analog-clock
+  title: World Clocks
+  hide-am-pm-indicator: false
+  hide-date: false
+  dial-markers: NumericalFull   # NumericalFull | NumericalMinimal | None
+  timezones:
+    - timezone: Europe/Paris
+      label: Paris
+    - timezone: America/New_York
+      label: New York
+    - timezone: Asia/Tokyo
+      label: Tokyo
+```
+
+**Features:**
+- Smooth animated hands (hour, minute, second)
+- Optional AM/PM indicator
+- Optional date slot showing day and abbreviated month
+- Three dial-marker styles: full numbers, minimal (3/6/9/12), or none
+- Multiple timezone faces displayed side by side
+- Client-side only — no server polling required
+
+**Properties:**
+- `hide-am-pm-indicator` (optional, default: false): Hide the AM/PM label inside the clock face
+- `hide-date` (optional, default: false): Hide the day/month date slot
+- `dial-markers` (optional, default: `NumericalFull`): Style of hour markers — `NumericalFull`, `NumericalMinimal`, or `None`
+- `timezones` (optional): Array of additional timezone clocks
+  - `timezone` (required): IANA timezone name (e.g. `America/New_York`)
+  - `label` (optional): Display label; falls back to timezone name if omitted
+
+---
+
 ## Calendar Widget (New - with Events)
 
 The new calendar widget displays a 3-week calendar view with support for events from ICS (iCalendar) files.

@@ -2,12 +2,9 @@ package glance
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	ics "github.com/arran4/golang-ical"
@@ -40,7 +37,6 @@ func (widget *calendarWidget) initialize() error {
 
 func (widget *calendarWidget) update(ctx context.Context) {
 	widget.Calendar = newCalendar(time.Now(), widget.StartSunday, widget.Icsurl)
-	fmt.Println(widget.Calendar.Days)
 	widget.withError(nil).scheduleNextUpdate()
 }
 
@@ -99,10 +95,9 @@ func newCalendar(now time.Time, startSunday bool, icsurl string) *calendar {
 				var dayEvent CalendarEvent
 				startAt, err := event.GetStartAt()
 				if err != nil {
-					log.Panic(err)
+					log.Printf("calendar: skipping event with invalid start date: %v", err)
+					continue
 				}
-				fmt.Println(year)
-				// fmt.Println(startAt.Day() == day && startAt.Month() == month)
 				if startAt.Day() == day && startAt.Month() == month && startAt.Year() == year {
 					dayEvent.StartedDay = startAt
 					dayEvent.EventHover = event.GetProperty("SUMMARY").Value
@@ -123,18 +118,6 @@ func newCalendar(now time.Time, startSunday bool, icsurl string) *calendar {
 	}
 }
 
-func ParseEventsFromFile(file string) []*ics.VEvent {
-	eventString, err := os.ReadFile(file)
-	if err != nil {
-		log.Panic(err)
-	}
-	cal, err := ics.ParseCalendar(strings.NewReader(string(eventString)))
-	if err != nil {
-		log.Panic(err)
-	}
-	events := cal.Events()
-	return events
-}
 func ReadPublicIcs(url string) ([]*ics.VEvent, error) {
 	response, err := http.Get(url)
 	if err != nil {
