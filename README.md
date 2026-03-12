@@ -14,5 +14,6 @@
 ## Merged PR's
 * [Calendar Events](https://github.com/glanceapp/glance/pull/174)
 * [Count Timer Widget](https://github.com/glanceapp/glance/pull/430)
+* [Bookmark Favicon Caching](https://github.com/glanceapp/glance/pull/439)
 
 For detailed widget configuration examples, see [WIDGET EXAMPLES](WIDGET_EXAMPLES.md)

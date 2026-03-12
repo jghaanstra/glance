@@ -34,6 +34,7 @@ type config struct {
 		Proxied    bool   `yaml:"proxied"`
 		AssetsPath string `yaml:"assets-path"`
 		BaseURL    string `yaml:"base-url"`
+		CachePath  string `yaml:"cache-path"`
 	} `yaml:"server"`
 
 	Auth struct {

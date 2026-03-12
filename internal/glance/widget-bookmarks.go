@@ -2,6 +2,7 @@ package glance
 
 import (
 	"html/template"
+	"net/url"
 )
 
 var bookmarksWidgetTemplate = mustParseTemplate("bookmarks.html", "widget-base.html")
@@ -62,6 +63,21 @@ func (widget *bookmarksWidget) initialize() error {
 					} else {
 						link.Target = "_blank"
 					}
+				}
+			}
+		}
+	}
+
+	for g := range widget.Groups {
+		group := &widget.Groups[g]
+		for l := range group.Links {
+			link := &group.Links[l]
+
+			if link.Icon.URL == "favicon" && link.URL != "" {
+				parsedURL, err := url.Parse(link.URL)
+				if err == nil {
+					// set the favicon proxy url directly on the URL field
+					link.Icon.URL = "/api/favicon?sz=32&domain=" + parsedURL.Hostname()
 				}
 			}
 		}

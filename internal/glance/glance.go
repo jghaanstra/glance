@@ -450,6 +450,9 @@ func (a *application) server() (func() error, func() error) {
 		w.WriteHeader(http.StatusOK)
 	})
 
+	// Favicon proxy endpoint
+	mux.HandleFunc("GET /api/favicon", a.handleFaviconRequest)
+
 	if a.RequiresAuth {
 		mux.HandleFunc("GET /login", a.handleLoginPageRequest)
 		mux.HandleFunc("GET /logout", a.handleLogoutRequest)

@@ -66,3 +66,84 @@ Displays a countdown timer to a specific date and time. Updates every second in 
 - `event-title` (optional): Event name. If set, title shows as "{event-title} ⋅ FUTURE/PAST"
 - `title` (optional): Static title. Used when `event-title` is not set or empty
 - `href` (optional): URL to link to when clicking the timer
+
+---
+
+## Bookmarks Widget (with Automatic Favicons)
+
+Displays bookmarks organized in groups with automatic favicon support.
+
+```yaml
+- type: bookmarks
+  groups:
+    - title: Development
+      links:
+        - title: GitHub
+          url: https://github.com
+          icon: favicon
+        - title: Stack Overflow
+          url: https://stackoverflow.com
+          icon: favicon
+    - title: Social
+      links:
+        - title: Twitter
+          url: https://twitter.com
+          icon: https://twitter.com/favicon.ico
+        - title: Reddit
+          url: https://reddit.com
+          icon:
+            type: emoji
+            value: "🔗"
+```
+
+**Features:**
+- Organize bookmarks into groups
+- Support for automatic favicons using `icon: favicon`
+- Manual favicon URLs supported
+- Emoji icons and other icon types
+- Customize target behavior (same tab / new tab)
+- Hide arrow icons optionally
+
+**Automatic Favicon Setup:**
+
+To use automatic favicons, you must configure a `cache-path` in your server config:
+
+```yaml
+server:
+  host: 0.0.0.0
+  port: 8080
+  cache-path: /var/cache/glance  # Path where favicons will be cached
+```
+
+Then in bookmarks, simply use `icon: favicon`:
+
+```yaml
+- type: bookmarks
+  groups:
+    - title: My Links
+      links:
+        - title: GitHub
+          url: https://github.com
+          icon: favicon  # Automatically fetches and caches favicon
+```
+
+**Features:**
+- Automatically fetches favicons from domains via Google's favicon service
+- Caches favicons locally for 1 week
+- Falls back to stale cache if fetch fails
+- No external HTTP requests needed after caching
+- Works with any URL
+
+**Properties:**
+- `groups` (required): Array of bookmark groups
+- `title` (optional): Group title
+- `color` (optional): Highlight color for group
+- `same-tab` (optional, default: false): Open links in same tab
+- `hide-arrow` (optional, default: false): Hide external link arrow
+- `target` (optional): Override HTML target attribute
+- `links` (required): Array of bookmark links
+  - `title` (required): Link title
+  - `url` (required): Link URL
+  - `icon` (optional): Icon (supports `favicon`, emoji, URLs, or icon libraries)
+  - `description` (optional): Link description
+
