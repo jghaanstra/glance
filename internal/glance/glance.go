@@ -284,32 +284,32 @@ func (p *page) updateWidgetsWithinDuration(duration time.Duration) {
 	context := context.Background()
 
 	for w := range p.HeadWidgets {
-		widget := p.HeadWidgets[w]
+		wgt := p.HeadWidgets[w]
 
-		if !widget.requiresUpdateWithin(&now, duration) {
+		if !wgt.requiresUpdateWithin(&now, duration) {
 			continue
 		}
 
 		wg.Add(1)
-		go func(wgt widget) {
+		go func(w widget) {
 			defer wg.Done()
-			wgt.update(context)
-		}(widget)
+			w.update(context)
+		}(wgt)
 	}
 
 	for c := range p.Columns {
 		for w := range p.Columns[c].Widgets {
-			widget := p.Columns[c].Widgets[w]
+			wgt := p.Columns[c].Widgets[w]
 
-			if !widget.requiresUpdateWithin(&now, duration) {
+			if !wgt.requiresUpdateWithin(&now, duration) {
 				continue
 			}
 
 			wg.Add(1)
-			go func(wgt widget) {
+			go func(w widget) {
 				defer wg.Done()
-				wgt.update(context)
-			}(widget)
+				w.update(context)
+			}(wgt)
 		}
 	}
 
