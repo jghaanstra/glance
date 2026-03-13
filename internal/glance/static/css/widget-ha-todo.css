@@ -1,0 +1,181 @@
+.ha-todo {
+    padding-top: 1rem;
+}
+
+.ha-todo-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ha-todo-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.ha-todo-checkbox {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 2px solid var(--color-text-subdue);
+    width: 1.4rem;
+    height: 1.4rem;
+    position: relative;
+    cursor: pointer;
+    border-radius: 0.3rem;
+    flex-shrink: 0;
+    transition: border-color .2s;
+}
+
+.ha-todo-checkbox::before {
+    content: "";
+    inset: -1rem;
+    position: absolute;
+}
+
+.ha-todo-checkbox::after {
+    content: '';
+    position: absolute;
+    inset: 0.3rem;
+    border-radius: 0.1rem;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.ha-todo-checkbox:checked::after {
+    background: var(--color-primary);
+    opacity: 1;
+}
+
+.ha-todo-checkbox:focus-visible {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.ha-todo-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ha-todo-text {
+    color: var(--color-text-base);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.ha-todo-text.completed {
+    text-decoration: line-through;
+    color: var(--color-text-subdue);
+}
+
+.ha-todo-due {
+    font-size: 0.75rem;
+    color: var(--color-text-subdue);
+    margin-top: 0.15rem;
+}
+
+.ha-todo-delete {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0;
+    transition: opacity .2s;
+    flex-shrink: 0;
+    outline-offset: .5rem;
+}
+
+.ha-todo-item:hover .ha-todo-delete,
+.ha-todo-item:focus-within .ha-todo-delete {
+    opacity: 1;
+}
+
+.ha-todo-section-label {
+    font-size: 0.75rem;
+    color: var(--color-text-subdue);
+    margin: 0.5rem 0 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ha-todo-empty {
+    color: var(--color-positive);
+    padding: 0.5rem 0;
+}
+
+.ha-todo-input {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 0 0.2rem;
+    color: var(--color-text-highlight);
+}
+
+.ha-todo-input:focus-within .ha-todo-plus-icon {
+    --icon-color: var(--color-text-base);
+}
+
+.ha-todo-plus-icon {
+    --icon-color: var(--color-text-subdue);
+    position: relative;
+    width: 1.4rem;
+    height: 1.4rem;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.ha-todo-plus-icon::before,
+.ha-todo-plus-icon::after {
+    content: "";
+    position: absolute;
+    background-color: var(--icon-color);
+    transition: background-color .2s;
+}
+
+.ha-todo-plus-icon::before {
+    width: 2px;
+    inset-block: 0.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ha-todo-plus-icon::after {
+    height: 2px;
+    inset-inline: 0.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.ha-todo-input-field {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--color-text-subdue);
+    color: var(--color-text-base);
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0.2rem 0;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.ha-todo-input-field:focus {
+    border-bottom-color: var(--color-primary);
+}
+
+.ha-todo-input-field::placeholder {
+    color: var(--color-text-base-muted);
+}
+
+.ha-todo-loading {
+    color: var(--color-text-subdue);
+    padding: 0.5rem 0;
+}
+
+.ha-todo-error {
+    color: var(--color-negative);
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+}

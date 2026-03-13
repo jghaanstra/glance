@@ -83,6 +83,8 @@ func newWidget(widgetType string) (widget, error) {
 		w = &serverStatsWidget{}
 	case "to-do":
 		w = &todoWidget{}
+	case "ha-todo":
+		w = &haTodoWidget{}
 	case "count-timer":
 		w = &countTimerWidget{}
 	default:

@@ -731,6 +731,17 @@ async function setupTodos() {
     }
 }
 
+async function setupHaTodos() {
+    const elems = document.getElementsByClassName("ha-todo");
+    if (elems.length == 0) return;
+
+    const mod = await import('./ha-todo.js');
+
+    for (let i = 0; i < elems.length; i++) {
+        mod.default(elems[i]);
+    }
+}
+
 function setupTruncatedElementTitles() {
     const elements = document.querySelectorAll(".text-truncate, .single-line-titles .title, .text-truncate-2-lines, .text-truncate-3-lines");
 
@@ -837,6 +848,7 @@ async function setupPage() {
         setUpCountdowns();
         await setupCalendars();
         await setupTodos();
+        await setupHaTodos();
         setupCarousels();
         setupSearchBoxes();
         setupCollapsibleLists();

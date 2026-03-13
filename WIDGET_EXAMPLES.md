@@ -323,4 +323,85 @@ prefix), configure arbitrary `shortcuts` for quick navigation, and enable
   - `url` (required): Search URL containing `!QUERY` placeholder
 - `autofocus`, `placeholder` behave as usual for input widgets
 
+---
+
+## Home Assistant To-Do Widget (`ha-todo`)
+
+Displays a live, interactive to-do list from a [Home Assistant](https://www.home-assistant.io/) todo entity. Items can be checked off, added, and deleted directly from the widget — changes are written back to Home Assistant in real time.
+
+**Basic example using environment variables (recommended):**
+
+```yaml
+- type: ha-todo
+  title: Shopping List
+  url: ${HA_URL}
+  token: ${HA_TOKEN}
+  entity: ${HA_TODO_ENTITY}
+  cache: 5m
+```
+
+Set the corresponding variables in your environment or Docker Compose file:
+
+```yaml
+# docker-compose.yml
+services:
+  glance:
+    image: glanceapp/glance
+    environment:
+      - HA_URL=http://homeassistant.local:8123
+      - HA_TOKEN=your_long_lived_access_token
+      - HA_TODO_ENTITY=todo.shopping_list
+```
+
+**Multiple lists with separate tokens per list:**
+
+```yaml
+- type: ha-todo
+  title: Shopping
+  url: ${HA_URL}
+  token: ${HA_TOKEN}
+  entity: todo.shopping_list
+
+- type: ha-todo
+  title: Reminders
+  url: ${HA_URL}
+  token: ${HA_TOKEN}
+  entity: todo.reminders
+  show-completed: true
+```
+
+**Using Docker Secrets instead of environment variables:**
+
+```yaml
+- type: ha-todo
+  title: Shopping List
+  url: ${HA_URL}
+  token: ${secret:ha_token}  # reads from /run/secrets/ha_token
+  entity: todo.shopping_list
+```
+
+**Features:**
+- Live view of active (and optionally completed) items
+- Check items off directly — status syncs back to Home Assistant
+- Add new items via the input row at the bottom
+- Delete items with the trash icon (visible on hover)
+- Completed items shown in a separate section below active items
+- Widget ID auto-derived from the entity name (e.g. `todo.reminders` → `todo-reminders`)
+
+**Properties:**
+- `url` (required): Base URL of your Home Assistant instance (e.g. `http://homeassistant.local:8123`). Supports `${ENV_VAR}` substitution.
+- `token` (required): Long-lived access token from Home Assistant. Supports `${ENV_VAR}` and `${secret:name}` substitution.
+- `entity` (required): The todo entity ID (e.g. `todo.shopping_list`). Supports `${ENV_VAR}` substitution.
+- `id` (optional): Explicit widget identifier used in API routing. Defaults to the entity name with `.` and `_` replaced by `-`.
+- `show-completed` (optional, default: `false`): When `true`, completed items are shown below active ones.
+- `cache` (optional, default: `5m`): How often the widget polls Home Assistant for updates in the background.
+
+**Config variable syntax reference:**
+
+| Syntax | Source |
+|---|---|
+| `${HA_TOKEN}` | Environment variable `HA_TOKEN` |
+| `${secret:ha_token}` | File `/run/secrets/ha_token` (Docker Secrets) |
+| `${readFileFromEnv:HA_TOKEN_FILE}` | File path stored in env variable `HA_TOKEN_FILE` |
+
 
