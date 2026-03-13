@@ -512,7 +512,11 @@ export default function SearchBox(widget) {
         }
 
         const active = document.activeElement;
-        const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+        const isTyping = active && (
+            (active.tagName === 'INPUT' && active.type !== 'radio' && active.type !== 'checkbox') ||
+            active.tagName === 'TEXTAREA' ||
+            active.isContentEditable
+        );
         if (event.key == kbdElement.textContent.toLowerCase() && !event.metaKey &&
             !event.ctrlKey && !event.altKey && active != inputElement && !isTyping) {
             event.preventDefault();
