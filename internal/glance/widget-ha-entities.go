@@ -239,16 +239,7 @@ func haEntitiesHandleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	widget.statesMu.RLock()
-	states := widget.states
-	widget.statesMu.RUnlock()
-
-	if states == nil {
-		states = map[string]haEntityState{}
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(states)
+	widget.refreshAndReturnStates(r.Context(), w)
 }
 
 func haEntitiesHandleToggle(w http.ResponseWriter, r *http.Request) {

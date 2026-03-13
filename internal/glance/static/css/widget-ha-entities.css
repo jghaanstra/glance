@@ -12,6 +12,7 @@
     gap: 0.7rem;
     padding: 0.75rem 0.5rem;
     border-radius: 0.3rem;
+    border: 1px solid var(--color-separator);
     background: var(--color-widget-background-alt, rgba(255,255,255,.04));
     min-width: 0;
     transition: background 0.2s, border-color 0.2s;
@@ -75,14 +76,14 @@
 }
 
 .ha-entities-icon {
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     object-fit: contain;
     transition: opacity 0.2s;
 }
 
 .ha-entities-title {
-    font-size: 0.9rem;
+    font-size: 1.4rem;
     color: var(--color-text-highlight);
     max-width: 100%;
     transition: color 0.2s;
