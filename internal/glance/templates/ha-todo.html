@@ -1,5 +1,8 @@
 {{ template "widget-base.html" . }}
 
 {{ define "widget-content" }}
-<div class="ha-todo" data-widget-id="{{ .WidgetID }}"></div>
+<div class="ha-todo"
+     data-widget-id="{{ .WidgetID }}"
+     data-empty-text="{{ .EmptyText }}"
+     data-add-placeholder="{{ .AddPlaceholder }}"></div>
 {{ end }}

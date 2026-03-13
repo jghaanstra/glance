@@ -12,6 +12,8 @@ function formatDue(due) {
 
 export default async function (element) {
     const widgetId = element.dataset.widgetId;
+    const emptyText = element.dataset.emptyText || 'No open tasks!';
+    const addPlaceholder = element.dataset.addPlaceholder || 'Add a task\u2026';
     const baseURL = (typeof pageData !== 'undefined' && pageData.baseURL) ? pageData.baseURL : '';
 
     async function request(method, suffix, body) {
@@ -108,7 +110,7 @@ export default async function (element) {
         if (activeItems.length === 0 && doneItems.length === 0) {
             const empty = document.createElement('p');
             empty.className = 'ha-todo-empty';
-            empty.textContent = 'All done!';
+            empty.textContent = emptyText;
             element.appendChild(empty);
         } else {
             const list = document.createElement('ul');
@@ -143,7 +145,7 @@ export default async function (element) {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'ha-todo-input-field';
-        input.placeholder = 'Add a task\u2026';
+        input.placeholder = addPlaceholder;
         input.setAttribute('spellcheck', 'false');
 
         input.addEventListener('keydown', async (e) => {

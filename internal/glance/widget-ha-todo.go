@@ -38,6 +38,8 @@ type haTodoWidget struct {
 	Entity           string        `yaml:"entity"`
 	ShowNeedsAction  *bool         `yaml:"show-needs-action"`
 	ShowCompleted    *bool         `yaml:"show-completed"`
+	EmptyText        string        `yaml:"empty-text"`
+	AddPlaceholder   string        `yaml:"add-placeholder"`
 	itemsMu          sync.RWMutex  `yaml:"-"`
 	items            []haTodoItem  `yaml:"-"`
 }
@@ -56,6 +58,13 @@ func (widget *haTodoWidget) initialize() error {
 	}
 	if widget.WidgetID == "" {
 		widget.WidgetID = strings.NewReplacer(".", "-", "_", "-", " ", "-").Replace(widget.Entity)
+	}
+
+	if widget.EmptyText == "" {
+		widget.EmptyText = "No open tasks!"
+	}
+	if widget.AddPlaceholder == "" {
+		widget.AddPlaceholder = "Add a task\u2026"
 	}
 
 	haTodoRegistryMu.Lock()

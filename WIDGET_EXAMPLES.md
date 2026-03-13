@@ -369,6 +369,8 @@ services:
   entity: todo.reminders
   show-completed: true
   # show-needs-action: false  # set to false to show only completed items
+  # empty-text: "All done! 🎉"
+  # add-placeholder: "Add a task…"
 ```
 
 **Using Docker Secrets instead of environment variables:**
@@ -396,6 +398,8 @@ services:
 - `id` (optional): Explicit widget identifier used in API routing. Defaults to the entity name with `.` and `_` replaced by `-`.
 - `show-needs-action` (optional, default: `true`): When `true`, active (uncompleted) items are shown.
 - `show-completed` (optional, default: `false`): When `true`, completed items are shown below active ones.
+- `empty-text` (optional, default: `"No open tasks!"`): Text shown when there are no items to display.
+- `add-placeholder` (optional, default: `"Add a task…"`): Placeholder text in the add-item input field.
 - `cache` (optional, default: `5m`): How often the widget polls Home Assistant for updates in the background.
 
 **Config variable syntax reference:**
