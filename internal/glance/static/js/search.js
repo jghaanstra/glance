@@ -511,8 +511,10 @@ export default function SearchBox(widget) {
             return;
         }
 
+        const active = document.activeElement;
+        const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
         if (event.key == kbdElement.textContent.toLowerCase() && !event.metaKey &&
-            !event.ctrlKey && !event.altKey && document.activeElement != inputElement) {
+            !event.ctrlKey && !event.altKey && active != inputElement && !isTyping) {
             event.preventDefault();
             inputElement.focus();
             return;

@@ -368,6 +368,7 @@ services:
   token: ${HA_TOKEN}
   entity: todo.reminders
   show-completed: true
+  # show-needs-action: false  # set to false to show only completed items
 ```
 
 **Using Docker Secrets instead of environment variables:**
@@ -393,6 +394,7 @@ services:
 - `token` (required): Long-lived access token from Home Assistant. Supports `${ENV_VAR}` and `${secret:name}` substitution.
 - `entity` (required): The todo entity ID (e.g. `todo.shopping_list`). Supports `${ENV_VAR}` substitution.
 - `id` (optional): Explicit widget identifier used in API routing. Defaults to the entity name with `.` and `_` replaced by `-`.
+- `show-needs-action` (optional, default: `true`): When `true`, active (uncompleted) items are shown.
 - `show-completed` (optional, default: `false`): When `true`, completed items are shown below active ones.
 - `cache` (optional, default: `5m`): How often the widget polls Home Assistant for updates in the background.
 

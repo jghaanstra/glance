@@ -19,7 +19,7 @@
 .ha-todo-checkbox {
     -webkit-appearance: none;
     appearance: none;
-    border: 2px solid var(--color-text-subdue);
+    border: 2px solid var(--color-text-highlight);
     width: 1.4rem;
     height: 1.4rem;
     position: relative;
@@ -62,7 +62,7 @@
 }
 
 .ha-todo-text {
-    color: var(--color-text-base);
+    color: var(--color-text-highlight);
     line-height: 1.4;
     word-break: break-word;
 }

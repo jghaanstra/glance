@@ -30,15 +30,16 @@ type haTodoItem struct {
 }
 
 type haTodoWidget struct {
-	widgetBase    `yaml:",inline"`
-	cachedHTML    template.HTML `yaml:"-"`
-	WidgetID      string        `yaml:"id"`
-	URL           string        `yaml:"url"`
-	Token         string        `yaml:"token"`
-	Entity        string        `yaml:"entity"`
-	ShowCompleted bool          `yaml:"show-completed"`
-	itemsMu       sync.RWMutex  `yaml:"-"`
-	items         []haTodoItem  `yaml:"-"`
+	widgetBase       `yaml:",inline"`
+	cachedHTML       template.HTML `yaml:"-"`
+	WidgetID         string        `yaml:"id"`
+	URL              string        `yaml:"url"`
+	Token            string        `yaml:"token"`
+	Entity           string        `yaml:"entity"`
+	ShowNeedsAction  *bool         `yaml:"show-needs-action"`
+	ShowCompleted    *bool         `yaml:"show-completed"`
+	itemsMu          sync.RWMutex  `yaml:"-"`
+	items            []haTodoItem  `yaml:"-"`
 }
 
 func (widget *haTodoWidget) initialize() error {
@@ -82,9 +83,18 @@ func (widget *haTodoWidget) update(ctx context.Context) {
 }
 
 func (widget *haTodoWidget) fetchFromHA(ctx context.Context) ([]haTodoItem, error) {
-	statusFilter := []string{"needs_action"}
-	if widget.ShowCompleted {
+	showNeedsAction := widget.ShowNeedsAction == nil || *widget.ShowNeedsAction
+	showCompleted := widget.ShowCompleted != nil && *widget.ShowCompleted
+
+	statusFilter := make([]string, 0, 2)
+	if showNeedsAction {
+		statusFilter = append(statusFilter, "needs_action")
+	}
+	if showCompleted {
 		statusFilter = append(statusFilter, "completed")
+	}
+	if len(statusFilter) == 0 {
+		return []haTodoItem{}, nil
 	}
 
 	reqBody, _ := json.Marshal(map[string]any{
