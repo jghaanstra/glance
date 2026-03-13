@@ -46,8 +46,7 @@ export default async function (element) {
         if (isToggleable || domain === 'binary_sensor') {
             tile.classList.add(stateStr === STATE_ON ? 'is-on' : 'is-off');
         } else if (isSensor) {
-            // Sensor: always show as active, display value
-            tile.classList.add('is-on');
+            // Sensor: neutral tile, just show value
             if (valueEl) {
                 valueEl.textContent = state.unit ? `${stateStr} ${state.unit}` : stateStr;
             }
