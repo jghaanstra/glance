@@ -86,9 +86,6 @@ func (widget *haEntitiesWidget) initialize() error {
 		e.Toggleable = haEntitiesToggleDomains[e.Domain]
 		e.IsScript = e.Domain == "script"
 		e.IsSensor = e.Domain == "sensor"
-		if e.Title == "" {
-			e.Title = e.EntityID
-		}
 	}
 
 	widget.states = make(map[string]haEntityState)
@@ -322,5 +319,6 @@ func haEntitiesHandleRun(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{}"))
 }

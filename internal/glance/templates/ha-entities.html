@@ -12,7 +12,7 @@
         {{ if .Icon.URL }}
         <img class="ha-entities-icon{{ if .Icon.AutoInvert }} flat-icon{{ end }}" src="{{ .Icon.URL }}" alt="" loading="lazy">
         {{ end }}
-        <span class="ha-entities-title text-truncate">{{ .Title }}</span>
+        {{ if .Title }}<span class="ha-entities-title text-truncate">{{ .Title }}</span>{{ end }}
         {{ if .IsSensor }}<span class="ha-entities-value"></span>{{ end }}
     </div>
     {{ end }}

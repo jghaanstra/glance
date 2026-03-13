@@ -12,6 +12,7 @@
 ![](docs/images/readme-main-image.png)
 
 ## Merged PR's
+* [Swipe Left/Right Column Navigation](https://github.com/glanceapp/glance/pull/684)
 * [Analog Clock Widget](https://github.com/glanceapp/glance/pull/747)
 * [Server-Side Todo Storage](https://github.com/glanceapp/glance/pull/838)
 * [Calendar Events](https://github.com/glanceapp/glance/pull/836)

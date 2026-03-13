@@ -426,7 +426,7 @@ Displays a configurable grid of Home Assistant entities. Switches, lights and in
   columns: 3
   entities:
     - entity: switch.living_room_lamp
-      title: Lamp
+      title: Lamp              # optional — omit to show icon only
       icon: mdi:floor-lamp
     - entity: light.ceiling
       title: Ceiling
@@ -435,11 +435,13 @@ Displays a configurable grid of Home Assistant entities. Switches, lights and in
       title: Temperature
       icon: mdi:thermometer
     - entity: binary_sensor.motion
-      title: Motion
-      icon: mdi:motion-sensor
+      icon: mdi:motion-sensor  # no title — tile shows icon only
     - entity: input_boolean.vacation_mode
       title: Vacation
       icon: mdi:airplane
+    - entity: script.evening_mode
+      title: Evening
+      icon: mdi:weather-night
 ```
 
 **Icon formats supported:**
@@ -461,6 +463,7 @@ icon: https://example.com/icon.svg  # Direct URL
 | `input_boolean` | Toggle on/off, colored when on |
 | `sensor` | Shows state + unit of measurement, read-only |
 | `binary_sensor` | Shows Aan/Uit state, read-only |
+| `script` | Button tile — tap to execute, briefly shows active color |
 
 **Features:**
 - Configurable number of columns (responsive by default)
@@ -477,7 +480,7 @@ icon: https://example.com/icon.svg  # Direct URL
 - `cache` (optional, default: `1m`): State refresh interval via background update.
 - `entities` (required): List of entity items
   - `entity` (required): Home Assistant entity ID (e.g. `switch.kitchen_light`)
-  - `title` (required): Display label shown below the icon
+  - `title` (optional): Display label shown below the icon. When omitted, only the icon is shown.
   - `icon` (optional): Icon using any supported format (see above)
 
 
