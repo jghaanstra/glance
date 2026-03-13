@@ -2,7 +2,6 @@
     display: grid;
     grid-template-columns: repeat(var(--ha-entities-cols, 3), 1fr);
     gap: 0.6rem;
-    padding-top: 0.25rem;
 }
 
 .ha-entities-tile {
@@ -10,11 +9,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
+    gap: 0.7rem;
     padding: 0.75rem 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.3rem;
     background: var(--color-widget-background-alt, rgba(255,255,255,.04));
-    border: 1px solid var(--color-separator);
     min-width: 0;
     transition: background 0.2s, border-color 0.2s;
     text-align: center;
@@ -23,10 +21,6 @@
 .ha-entities-tile.is-toggleable {
     cursor: pointer;
     user-select: none;
-}
-
-.ha-entities-tile.is-toggleable:hover {
-    border-color: var(--color-text-subdue);
 }
 
 .ha-entities-tile.is-on {
@@ -39,8 +33,7 @@
     opacity: 1;
 }
 
-.ha-entities-tile.is-on .ha-entities-title,
-.ha-entities-tile.is-on .ha-entities-value {
+.ha-entities-tile.is-on .ha-entities-title {
     color: var(--color-primary);
 }
 
@@ -53,25 +46,50 @@
 .ha-entities-tile.is-off .ha-entities-value,
 .ha-entities-tile.is-unknown .ha-entities-title,
 .ha-entities-tile.is-unknown .ha-entities-value {
-    color: var(--color-text-subdue);
+    color: var(--color-text-highlight);
+}
+
+/* Script button tile */
+.ha-entities-tile.is-script {
+    cursor: pointer;
+    user-select: none;
+}
+
+.ha-entities-tile.is-script:hover {
+    border-color: var(--color-text-subdue);
+}
+
+.ha-entities-tile.is-executed {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.ha-entities-tile.is-executed .ha-entities-title {
+    color: var(--color-primary);
+    transition: color 0.1s;
+}
+
+.ha-entities-tile.is-executed .ha-entities-icon {
+    opacity: 1;
 }
 
 .ha-entities-icon {
-    width: 2rem;
-    height: 2rem;
+    width: 3rem;
+    height: 3rem;
     object-fit: contain;
     transition: opacity 0.2s;
 }
 
 .ha-entities-title {
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     color: var(--color-text-highlight);
     max-width: 100%;
     transition: color 0.2s;
 }
 
 .ha-entities-value {
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     color: var(--color-text-subdue);
     transition: color 0.2s;
     min-height: 1em;

@@ -30,6 +30,7 @@ export default async function (element) {
     function applyState(tile, state) {
         const domain = tile.dataset.domain;
         const isToggleable = tile.dataset.toggleable === 'true';
+        const isSensor = tile.dataset.sensor === 'true';
         const valueEl = tile.querySelector('.ha-entities-value');
 
         tile.classList.remove('is-on', 'is-off', 'is-unknown', 'is-loading');
@@ -42,21 +43,16 @@ export default async function (element) {
 
         const stateStr = state.state;
 
-        if (isToggleable) {
-            // Switch/light/input_boolean: on/off
+        if (isToggleable || domain === 'binary_sensor') {
             tile.classList.add(stateStr === STATE_ON ? 'is-on' : 'is-off');
-            if (valueEl) valueEl.textContent = stateStr === STATE_ON ? 'Aan' : 'Uit';
-        } else if (domain === 'binary_sensor') {
-            tile.classList.add(stateStr === STATE_ON ? 'is-on' : 'is-off');
-            if (valueEl) valueEl.textContent = stateStr === STATE_ON ? 'Aan' : 'Uit';
-        } else {
-            // Sensor and others: show value + unit
+        } else if (isSensor) {
+            // Sensor: always show as active, display value
             tile.classList.add('is-on');
             if (valueEl) {
-                valueEl.textContent = state.unit
-                    ? `${stateStr} ${state.unit}`
-                    : stateStr;
+                valueEl.textContent = state.unit ? `${stateStr} ${state.unit}` : stateStr;
             }
+        } else {
+            tile.classList.add('is-on');
         }
     }
 
@@ -79,6 +75,24 @@ export default async function (element) {
                 applyStates(updated);
             } catch (err) {
                 console.error('ha-entities toggle failed:', err);
+            } finally {
+                tile.classList.remove('is-pending');
+            }
+        });
+    }
+
+    // Attach click handlers for script tiles
+    for (const tile of element.querySelectorAll('.ha-entities-tile.is-script')) {
+        tile.addEventListener('click', async () => {
+            if (tile.classList.contains('is-pending')) return;
+
+            tile.classList.add('is-pending');
+            try {
+                await request('POST', '/run', { entity_id: tile.dataset.entityId });
+                tile.classList.add('is-executed');
+                setTimeout(() => tile.classList.remove('is-executed'), 2000);
+            } catch (err) {
+                console.error('ha-entities run failed:', err);
             } finally {
                 tile.classList.remove('is-pending');
             }

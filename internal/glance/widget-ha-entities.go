@@ -36,6 +36,8 @@ type haEntityConfig struct {
 	Icon       customIconField `yaml:"icon"`
 	Domain     string          `yaml:"-"`
 	Toggleable bool            `yaml:"-"`
+	IsScript   bool            `yaml:"-"`
+	IsSensor   bool            `yaml:"-"`
 }
 
 type haEntityState struct {
@@ -82,6 +84,8 @@ func (widget *haEntitiesWidget) initialize() error {
 			e.Domain = e.EntityID[:idx]
 		}
 		e.Toggleable = haEntitiesToggleDomains[e.Domain]
+		e.IsScript = e.Domain == "script"
+		e.IsSensor = e.Domain == "sensor"
 		if e.Title == "" {
 			e.Title = e.EntityID
 		}
@@ -146,7 +150,9 @@ func (widget *haEntitiesWidget) fetchStates(ctx context.Context) (map[string]haE
 
 	needed := make(map[string]bool, len(widget.Entities))
 	for _, e := range widget.Entities {
-		needed[e.EntityID] = true
+		if !e.IsScript {
+			needed[e.EntityID] = true
+		}
 	}
 
 	states := make(map[string]haEntityState, len(widget.Entities))
@@ -205,8 +211,9 @@ func (widget *haEntitiesWidget) refreshAndReturnStates(ctx context.Context, w ht
 
 func (widget *haEntitiesWidget) getHandlerFunc() map[string]http.HandlerFunc {
 	return map[string]http.HandlerFunc{
-		"GET /{id}":           haEntitiesHandleGet,
-		"POST /{id}/toggle":   haEntitiesHandleToggle,
+		"GET /{id}":         haEntitiesHandleGet,
+		"POST /{id}/toggle": haEntitiesHandleToggle,
+		"POST /{id}/run":    haEntitiesHandleRun,
 	}
 }
 
@@ -291,4 +298,38 @@ func haEntitiesHandleToggle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	widget.refreshAndReturnStates(r.Context(), w)
+}
+
+func haEntitiesHandleRun(w http.ResponseWriter, r *http.Request) {
+	widget := lookupHaEntities(w, r)
+	if widget == nil {
+		return
+	}
+
+	var body struct {
+		EntityID string `json:"entity_id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.EntityID == "" {
+		http.Error(w, "entity_id is required", http.StatusBadRequest)
+		return
+	}
+
+	found := false
+	for _, e := range widget.Entities {
+		if e.EntityID == body.EntityID && e.IsScript {
+			found = true
+			break
+		}
+	}
+	if !found {
+		http.Error(w, "script not found in widget", http.StatusNotFound)
+		return
+	}
+
+	if err := widget.callHAService(r.Context(), "script", "turn_on", body.EntityID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
