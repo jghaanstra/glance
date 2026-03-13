@@ -410,4 +410,74 @@ services:
 | `${secret:ha_token}` | File `/run/secrets/ha_token` (Docker Secrets) |
 | `${readFileFromEnv:HA_TOKEN_FILE}` | File path stored in env variable `HA_TOKEN_FILE` |
 
+---
+
+## Home Assistant Entities Widget (`ha-entities`)
+
+Displays a configurable grid of Home Assistant entities. Switches, lights and input booleans work as interactive toggles (tap to turn on/off, colored by state). Sensors and binary sensors display their current value read-only.
+
+**Basic example:**
+
+```yaml
+- type: ha-entities
+  title: Living Room
+  url: ${HA_URL}
+  token: ${HA_TOKEN}
+  columns: 3
+  entities:
+    - entity: switch.living_room_lamp
+      title: Lamp
+      icon: mdi:floor-lamp
+    - entity: light.ceiling
+      title: Ceiling
+      icon: mdi:ceiling-light
+    - entity: sensor.temperature
+      title: Temperature
+      icon: mdi:thermometer
+    - entity: binary_sensor.motion
+      title: Motion
+      icon: mdi:motion-sensor
+    - entity: input_boolean.vacation_mode
+      title: Vacation
+      icon: mdi:airplane
+```
+
+**Icon formats supported:**
+
+```yaml
+icon: mdi:lightbulb          # Material Design Icons (auto-invert)
+icon: si:homeassistant       # Simple Icons (auto-invert)
+icon: di:home-assistant.png  # Dashboard Icons
+icon: sh:home-assistant.svg  # selfh.st icons
+icon: https://example.com/icon.svg  # Direct URL
+```
+
+**Entity types and behaviour:**
+
+| Domain | Behaviour |
+|---|---|
+| `switch` | Toggle on/off, colored when on |
+| `light` | Toggle on/off, colored when on |
+| `input_boolean` | Toggle on/off, colored when on |
+| `sensor` | Shows state + unit of measurement, read-only |
+| `binary_sensor` | Shows Aan/Uit state, read-only |
+
+**Features:**
+- Configurable number of columns (responsive by default)
+- Optimistic toggle with pending state (no double-click)
+- State loaded on page render via Go cache interval
+- Icon + title rendered server-side; state updated client-side
+- Auto-derives widget ID — no manual `id:` needed unless you have multiple ha-entities widgets with the same first entity
+
+**Properties:**
+- `url` (required): Home Assistant base URL. Supports `${ENV_VAR}` substitution.
+- `token` (required): Long-lived access token. Supports `${ENV_VAR}` and `${secret:name}`.
+- `columns` (optional, default: `3`): Number of columns in the grid.
+- `id` (optional): Explicit widget ID for API routing. Auto-generated if omitted.
+- `cache` (optional, default: `1m`): State refresh interval via background update.
+- `entities` (required): List of entity items
+  - `entity` (required): Home Assistant entity ID (e.g. `switch.kitchen_light`)
+  - `title` (required): Display label shown below the icon
+  - `icon` (optional): Icon using any supported format (see above)
+
 

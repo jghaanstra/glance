@@ -742,6 +742,17 @@ async function setupHaTodos() {
     }
 }
 
+async function setupHaEntities() {
+    const elems = document.getElementsByClassName("ha-entities-grid");
+    if (elems.length == 0) return;
+
+    const mod = await import('./ha-entities.js');
+
+    for (let i = 0; i < elems.length; i++) {
+        mod.default(elems[i]);
+    }
+}
+
 function setupTruncatedElementTitles() {
     const elements = document.querySelectorAll(".text-truncate, .single-line-titles .title, .text-truncate-2-lines, .text-truncate-3-lines");
 
@@ -849,6 +860,7 @@ async function setupPage() {
         await setupCalendars();
         await setupTodos();
         await setupHaTodos();
+        await setupHaEntities();
         setupCarousels();
         setupSearchBoxes();
         setupCollapsibleLists();

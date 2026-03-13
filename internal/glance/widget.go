@@ -85,6 +85,8 @@ func newWidget(widgetType string) (widget, error) {
 		w = &todoWidget{}
 	case "ha-todo":
 		w = &haTodoWidget{}
+	case "ha-entities":
+		w = &haEntitiesWidget{}
 	case "count-timer":
 		w = &countTimerWidget{}
 	default:

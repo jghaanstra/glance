@@ -1,0 +1,18 @@
+{{ template "widget-base.html" . }}
+
+{{ define "widget-content" }}
+<div class="ha-entities-grid" data-widget-id="{{ .WidgetID }}" style="--ha-entities-cols: {{ .Columns }}">
+    {{ range .Entities }}
+    <div class="ha-entities-tile{{ if .Toggleable }} is-toggleable{{ end }}"
+         data-entity-id="{{ .EntityID }}"
+         data-domain="{{ .Domain }}"
+         data-toggleable="{{ .Toggleable }}">
+        {{ if .Icon.URL }}
+        <img class="ha-entities-icon{{ if .Icon.AutoInvert }} flat-icon{{ end }}" src="{{ .Icon.URL }}" alt="" loading="lazy">
+        {{ end }}
+        <span class="ha-entities-title text-truncate">{{ .Title }}</span>
+        <span class="ha-entities-value"></span>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
