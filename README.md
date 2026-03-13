@@ -24,5 +24,6 @@
 
 ## Custom widgets
 * Home Assistant ToDo Lists
+* Home Assistant Entities
 
 For detailed widget configuration examples, see [WIDGET EXAMPLES](WIDGET_EXAMPLES.md)
