@@ -499,8 +499,12 @@ export default function SearchBox(widget) {
         }, 150);
     });
 
-    // Check if input is already focused (e.g., due to autofocus)
-    if (document.activeElement === inputElement) {
+    // Actively focus the input if autofocus is set — the HTML autofocus attribute
+    // is unreliable for dynamically loaded content, especially when async widget
+    // setup (e.g. HA widgets with network requests) runs before the search widget
+    if (inputElement.hasAttribute("autofocus")) {
+        inputElement.focus();
+    } else if (document.activeElement === inputElement) {
         attachFocusListeners();
     }
 
