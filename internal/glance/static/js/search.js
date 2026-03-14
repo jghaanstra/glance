@@ -443,6 +443,8 @@ export default function SearchBox(widget) {
     };
 
     const handleInput = (event) => {
+        if (event.target !== inputElement) return;
+
         const value = event.target.value.trim();
 
         // Check for bangs first
