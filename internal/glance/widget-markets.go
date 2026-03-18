@@ -32,6 +32,31 @@ func (md MarketDuration) Valid() bool {
 	return slices.Contains([]MarketDuration{"1d", "1w", "1m", "3m", "6m", "1y", "2y", "5y", "max"}, md)
 }
 
+func (md MarketDuration) yahooRangeAndInterval() (string, string) {
+	switch md {
+	case "1d":
+		return "1d", "5m"
+	case "1w":
+		return "5d", "1h"
+	case "1m":
+		return "1mo", "1d"
+	case "3m":
+		return "3mo", "1d"
+	case "6m":
+		return "6mo", "1d"
+	case "1y":
+		return "1y", "1wk"
+	case "2y":
+		return "2y", "1wk"
+	case "5y":
+		return "5y", "1mo"
+	case "max":
+		return "max", "3mo"
+	default:
+		return "1mo", "1d"
+	}
+}
+
 func (widget *marketsWidget) initialize() error {
 	widget.withTitle("Markets").withCacheDuration(time.Hour)
 
@@ -130,14 +155,15 @@ type marketResponseJson struct {
 	} `json:"chart"`
 }
 
-// TODO: allow changing chart time frame
-const marketChartDays = 21
+const marketChartPoints = 56
 
-func fetchMarketsDataFromYahoo(marketRequests []marketRequest, interval MarketDuration) (marketList, error) {
+func fetchMarketsDataFromYahoo(marketRequests []marketRequest, duration MarketDuration) (marketList, error) {
 	requests := make([]*http.Request, 0, len(marketRequests))
 
+	yahooRange, yahooInterval := duration.yahooRangeAndInterval()
+
 	for i := range marketRequests {
-		request, _ := http.NewRequest("GET", fmt.Sprintf("https://query1.finance.yahoo.com/v8/finance/chart/%s?range=1mo&interval=%s", marketRequests[i].Symbol, interval), nil)
+		request, _ := http.NewRequest("GET", fmt.Sprintf("https://query1.finance.yahoo.com/v8/finance/chart/%s?range=%s&interval=%s", marketRequests[i].Symbol, yahooRange, yahooInterval), nil)
 		setBrowserUserAgentHeader(request)
 		requests = append(requests, request)
 	}
@@ -169,14 +195,21 @@ func fetchMarketsDataFromYahoo(marketRequests []marketRequest, interval MarketDu
 		result := &response.Chart.Result[0]
 		prices := result.Indicators.Quote[0].Close
 
-		if len(prices) > marketChartDays {
-			prices = prices[len(prices)-marketChartDays:]
+		if len(prices) > marketChartPoints {
+			prices = prices[len(prices)-marketChartPoints:]
 		}
 
-		previous := result.Meta.RegularMarketPrice
-
-		if len(prices) >= 2 && prices[len(prices)-2] != 0 {
-			previous = prices[len(prices)-2]
+		previous := result.Meta.ChartPreviousClose
+		if previous == 0 {
+			for _, p := range prices {
+				if p != 0 {
+					previous = p
+					break
+				}
+			}
+		}
+		if previous == 0 {
+			previous = result.Meta.RegularMarketPrice
 		}
 
 		points := svgPolylineCoordsFromYValues(100, 50, maybeCopySliceWithoutZeroValues(prices))
