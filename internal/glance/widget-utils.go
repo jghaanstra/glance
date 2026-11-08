@@ -51,12 +51,25 @@ func getBrowserUserAgentHeader() string {
 		userAgentPersistentVersion.Store(rand.Int32N(5))
 	}
 
-	version := strconv.Itoa(130 + int(userAgentPersistentVersion.Load()))
+	version := strconv.Itoa(148 + int(userAgentPersistentVersion.Load()))
 	return "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:" + version + ".0) Gecko/20100101 Firefox/" + version + ".0"
 }
 
 func setBrowserUserAgentHeader(request *http.Request) {
 	request.Header.Set("User-Agent", getBrowserUserAgentHeader())
+}
+
+const defaultMaxResponseBodyLength = 1024 * 1024 * 10 // 10 MB
+
+func readAllLimited(r io.Reader, max int64) ([]byte, error) {
+	b, err := io.ReadAll(io.LimitReader(r, max+1))
+	if err != nil {
+		return nil, err
+	}
+	if int64(len(b)) > max {
+		return nil, errors.New("response body exceeds size limit")
+	}
+	return b, nil
 }
 
 func decodeJsonFromRequest[T any](client requestDoer, request *http.Request) (T, error) {
@@ -68,7 +81,7 @@ func decodeJsonFromRequest[T any](client requestDoer, request *http.Request) (T,
 	}
 	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
+	body, err := readAllLimited(response.Body, defaultMaxResponseBodyLength)
 	if err != nil {
 		return result, err
 	}
@@ -108,7 +121,7 @@ func decodeXmlFromRequest[T any](client requestDoer, request *http.Request) (T, 
 	}
 	defer response.Body.Close()
 
-	body, err := io.ReadAll(response.Body)
+	body, err := readAllLimited(response.Body, defaultMaxResponseBodyLength)
 	if err != nil {
 		return result, err
 	}
@@ -132,10 +145,9 @@ func decodeXmlFromRequest[T any](client requestDoer, request *http.Request) (T, 
 	return result, nil
 }
 
-func decodeXmlFromRequestTask[T any](client requestDoer) func(*http.Request) (T, error) {
-	return func(request *http.Request) (T, error) {
-		return decodeXmlFromRequest[T](client, request)
-	}
+type cachedEntry[T any] struct {
+	value     T
+	timestamp time.Time
 }
 
 type workerPoolTask[I any, O any] struct {

@@ -367,13 +367,13 @@ func (a *application) populateTemplateRequestData(data *templateRequestData, r *
 }
 
 func (a *application) handlePageRequest(w http.ResponseWriter, r *http.Request) {
-	page, exists := a.slugToPage[r.PathValue("page")]
-	if !exists {
-		a.handleNotFound(w, r)
+	if a.handleUnauthorizedResponse(w, r, redirectToLogin) {
 		return
 	}
 
-	if a.handleUnauthorizedResponse(w, r, redirectToLogin) {
+	page, exists := a.slugToPage[r.PathValue("page")]
+	if !exists {
+		a.handleNotFound(w, r)
 		return
 	}
 
@@ -395,13 +395,13 @@ func (a *application) handlePageRequest(w http.ResponseWriter, r *http.Request) 
 }
 
 func (a *application) handlePageContentRequest(w http.ResponseWriter, r *http.Request) {
-	page, exists := a.slugToPage[r.PathValue("page")]
-	if !exists {
-		a.handleNotFound(w, r)
+	if a.handleUnauthorizedResponse(w, r, showUnauthorizedJSON) {
 		return
 	}
 
-	if a.handleUnauthorizedResponse(w, r, showUnauthorizedJSON) {
+	page, exists := a.slugToPage[r.PathValue("page")]
+	if !exists {
+		a.handleNotFound(w, r)
 		return
 	}
 
@@ -451,11 +451,20 @@ func (a *application) addressOfRequest(r *http.Request) string {
 	}
 
 	ips := strings.Split(forwardedFor, ",")
-	if len(ips) == 0 || ips[0] == "" {
+	if len(ips) == 0 {
 		return remoteAddrWithoutPort()
 	}
 
-	return ips[0]
+	// Use the last (rightmost) IP in X-Forwarded-For, as this is the
+	// one added by the trusted reverse proxy. The leftmost values can
+	// be spoofed by the client and must not be trusted for rate limiting
+	// or other security-sensitive operations.
+	lastIP := strings.TrimSpace(ips[len(ips)-1])
+	if lastIP == "" {
+		return remoteAddrWithoutPort()
+	}
+
+	return lastIP
 }
 
 func (a *application) handleNotFound(w http.ResponseWriter, _ *http.Request) {
@@ -586,7 +595,7 @@ func (a *application) StaticAssetPath(asset string) string {
 }
 
 func (a *application) VersionedAssetPath(asset string) string {
-	return a.Config.Server.BaseURL + asset +
+	return a.Config.Server.BaseURL + "/" + asset +
 		"?v=" + strconv.FormatInt(a.CreatedAt.Unix(), 10)
 }
 
@@ -681,13 +690,14 @@ func (a *application) server() (func() error, func() error) {
 	})
 
 	server := http.Server{
-		Addr:    fmt.Sprintf("%s:%d", a.Config.Server.Host, a.Config.Server.Port),
-		Handler: handler,
+		Addr:              fmt.Sprintf("%s:%d", a.Config.Server.Host, a.Config.Server.Port),
+		Handler:           handler,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
 	}
 
 	// Start background refresh if enabled; the goroutine itself will check for
 	// the "only when clients" flag on each tick.
-	
 	if a.Config.Server.BackgroundRefreshEnabled {
 		a.startBackgroundRefresh()
 	}

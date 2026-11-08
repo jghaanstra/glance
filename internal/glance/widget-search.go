@@ -47,6 +47,7 @@ var searchEngines = map[string]string{
 	"perplexity": "https://www.perplexity.ai/search?q={QUERY}",
 	"kagi": "https://kagi.com/search?q={QUERY}",
 	"startpage": "https://www.startpage.com/search?q={QUERY}",
+	"brave": "https://search.brave.com/search?q={QUERY}",
 }
 var suggestionEngines = map[string]string{
 	"google": "https://suggestqueries.google.com/complete/search?output=firefox&q={QUERY}",
